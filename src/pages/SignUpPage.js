@@ -1,24 +1,58 @@
-import { Link } from "react-router-dom"
-import styled from "styled-components"
-import MyWalletLogo from "../components/MyWalletLogo"
+import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import MyWalletLogo from "../components/MyWalletLogo";
+import { myWalletApiAdapter } from "../services";
 
 export default function SignUpPage() {
+  const navigate = useNavigate();
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const name = event.target["name"].value;
+    const email = event.target["email"].value;
+    const password = event.target["password"].value;
+    const confirm = event.target["password-confirm"].value;
+
+    if (confirm !== password) {
+      alert("As senhas não são iguais!");
+      return;
+    }
+
+    try {
+      const user = { name, email, password };
+      await myWalletApiAdapter.signUp(user);
+      navigate("/");
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
   return (
     <SingUpContainer>
-      <form>
+      <form onSubmit={handleSubmit}>
         <MyWalletLogo />
-        <input placeholder="Nome" type="text" />
-        <input placeholder="E-mail" type="email" />
-        <input placeholder="Senha" type="password" autocomplete="new-password" />
-        <input placeholder="Confirme a senha" type="password" autocomplete="new-password" />
-        <button>Cadastrar</button>
+        <input required name="name" placeholder="Nome" type="text" />
+        <input required name="email" placeholder="E-mail" type="email" />
+        <input
+          required
+          name="password"
+          placeholder="Senha"
+          type="password"
+          autoComplete="new-password"
+        />
+        <input
+          required
+          name="password-confirm"
+          placeholder="Confirme a senha"
+          type="password"
+          autoComplete="new-password"
+        />
+        <button type="submit">Cadastrar</button>
       </form>
 
-      <Link>
-        Já tem uma conta? Entre agora!
-      </Link>
+      <Link to="/">Já tem uma conta? Entre agora!</Link>
     </SingUpContainer>
-  )
+  );
 }
 
 const SingUpContainer = styled.section`
@@ -27,4 +61,4 @@ const SingUpContainer = styled.section`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`
+`;

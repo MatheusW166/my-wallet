@@ -46,13 +46,15 @@ const GlobalStyle = createGlobalStyle`
         border-radius: 5px;
     }
     a {
-        font-weight: 700;
-        font-size: 15px;
-        line-height: 18px;
-        color: white;
         text-decoration: none;
-        padding-top: 30px;
+        line-height: 0;
+        padding: 0;
+        margin: 0;
+        font-size: inherit;
+        color: inherit;
+        cursor: pointer;
     }
-`
+    
+`;
 
-export default GlobalStyle
+export default GlobalStyle;

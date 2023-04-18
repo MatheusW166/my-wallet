@@ -12,7 +12,7 @@ function formatMoney(value) {
 }
 
 export default function HomePage() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [transactions, setTransactions] = useState();
 
   useEffect(() => {
@@ -29,11 +29,16 @@ export default function HomePage() {
     0
   );
 
+  function logOut() {
+    setUser(null);
+    localStorage.removeItem("my-wallet");
+  }
+
   return (
     <HomeContainer>
       <Header>
         <h1>Olá, {user?.name}</h1>
-        <Link to="/">
+        <Link to="/" onClick={logOut}>
           <BiExit />
         </Link>
       </Header>

@@ -61,4 +61,11 @@ const SingUpContainer = styled.section`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  a {
+    color: white;
+    line-height: normal;
+    margin-top: 30px;
+    font-weight: 700;
+  }
 `;

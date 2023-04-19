@@ -1,6 +1,5 @@
 import MyWalletApiAdapter from "./myWalletApi.adapter";
 
-const URL = "http://localhost:5000";
-const myWalletApiAdapter = new MyWalletApiAdapter(URL);
+const myWalletApiAdapter = new MyWalletApiAdapter();
 
 export default myWalletApiAdapter;

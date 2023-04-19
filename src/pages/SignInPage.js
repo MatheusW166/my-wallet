@@ -13,13 +13,13 @@ export default function SignInPage() {
     event.preventDefault();
     const email = event.target["email"].value;
     const password = event.target["password"].value;
-
     try {
       const user = await myWalletApiAdapter.logIn({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
       setUser(user);
+      console.log(user);
       navigate("/home");
       localStorage.setItem("my-wallet", JSON.stringify(user));
     } catch (err) {

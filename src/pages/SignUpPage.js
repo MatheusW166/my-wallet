@@ -19,7 +19,11 @@ export default function SignUpPage() {
     }
 
     try {
-      const user = { name, email, password };
+      const user = {
+        name: name.trim(),
+        email: email.trim(),
+        password: password.trim(),
+      };
       await myWalletApiAdapter.signUp(user);
       navigate("/");
     } catch (err) {

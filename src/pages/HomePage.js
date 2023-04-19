@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import UserContext from "../contexts/user.context";
 import { Link } from "react-router-dom";
 import { myWalletApiAdapter } from "../services";
+import dayjs from "dayjs";
 
 function formatMoney(value) {
   if (!value) return "";
@@ -18,7 +19,7 @@ export default function HomePage() {
   useEffect(() => {
     myWalletApiAdapter
       .getUserTransactions({
-        userId: user.id,
+        token: user.token,
       })
       .then((res) => setTransactions(res))
       .catch((err) => alert(err.message));
@@ -51,8 +52,8 @@ export default function HomePage() {
                 state={t}
                 to={`/editar-registro/${t.isExit ? "saida" : "entrada"}`}>
                 <div>
-                  <span>{t.date}</span>
-                  <strong>{t.title}</strong>
+                  <span>{dayjs(t.createdAt).format("DD/MM")}</span>
+                  <strong>{t.description}</strong>
                 </div>
                 <Value color={t.isExit ? "negativo" : "positivo"}>
                   {formatMoney(t.value)}

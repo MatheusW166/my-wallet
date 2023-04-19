@@ -1,11 +1,22 @@
 import axios, { AxiosError } from "axios";
 
-const client = axios.create({ baseURL: "http://localhost:5000/" });
+const client = axios.create({ baseURL: "http://localhost:5000" });
 
 class MyWalletApiAdapter {
-  // getUserTransactions = async ({ userId }) => {
-  //   return transactions.filter((t) => t.userId === userId);
-  // };
+  getUserTransactions = async ({ token }) => {
+    try {
+      const response = await client.get("/transaction", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (err) {
+      console.log(err.response);
+      if (!(err instanceof AxiosError)) {
+        throw Error("Unknown error");
+      }
+      throw Error(err.response?.data);
+    }
+  };
 
   logIn = async ({ email, password }) => {
     try {

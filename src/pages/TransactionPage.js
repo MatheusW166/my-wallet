@@ -1,16 +1,30 @@
 import { useContext } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import UserContext from "../contexts/user.context";
 import myWalletApi from "../services/mywalletapi.service.js";
+import { useMutation } from "react-query";
+import Loading from "../components/Loading.js";
 
 export default function TransactionsPage() {
   const { user } = useContext(UserContext);
   const { tipo } = useParams();
   const { state } = useLocation();
+  const navigate = useNavigate();
 
   const type = tipo === "saida" ? "saída" : "entrada";
   const editing = state !== null;
+
+  const { mutate, isLoading } = useMutation(async (transaction) => {
+    try {
+      if (!editing) {
+        await myWalletApi.createTransaction(transaction);
+        navigate("/home");
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  });
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -23,16 +37,15 @@ export default function TransactionsPage() {
       value: value,
     };
 
-    if (!editing) {
-      myWalletApi
-        .createTransaction({ ...transaction, token: user.token })
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
-    }
+    mutate({
+      ...transaction,
+      token: user.token,
+    });
   }
 
   return (
     <TransactionsContainer>
+      <Loading active={isLoading} />
       <h1>
         {editing ? "Editar" : "Nova"} {type}
       </h1>

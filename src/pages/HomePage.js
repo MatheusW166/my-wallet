@@ -34,6 +34,8 @@ export default function HomePage() {
     0
   );
 
+  const empty = data?.length === 0;
+
   return (
     <HomeContainer>
       <Loading active={isLoading} />
@@ -46,23 +48,27 @@ export default function HomePage() {
       </Header>
 
       <TransactionsContainer>
-        <ul>
-          {data?.map((t, idx) => (
-            <ListItemContainer key={idx}>
-              <Link
-                state={t}
-                to={`/editar-registro/${t.isExit ? "saida" : "entrada"}`}>
-                <div>
-                  <span>{dayjs(t.createdAt).format("DD/MM")}</span>
-                  <strong>{t.description}</strong>
-                </div>
-                <Value color={t.isExit ? "negativo" : "positivo"}>
-                  {formatMoney(t.value)}
-                </Value>
-              </Link>
-            </ListItemContainer>
-          ))}
-        </ul>
+        {empty ? (
+          <p>Não há registros de entrada ou saída</p>
+        ) : (
+          <ul>
+            {data?.map((t, idx) => (
+              <ListItemContainer key={idx}>
+                <Link
+                  state={t}
+                  to={`/editar-registro/${t.isExit ? "saida" : "entrada"}`}>
+                  <div>
+                    <span>{dayjs(t.createdAt).format("DD/MM")}</span>
+                    <strong>{t.description}</strong>
+                  </div>
+                  <Value color={t.isExit ? "negativo" : "positivo"}>
+                    {formatMoney(t.value)}
+                  </Value>
+                </Link>
+              </ListItemContainer>
+            ))}
+          </ul>
+        )}
         <article>
           <strong>Saldo</strong>
           <Value color={total < 0 ? "negativo" : "positivo"}>
@@ -117,7 +123,19 @@ const TransactionsContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: stretch;
   overflow: hidden;
+
+  p {
+    color: #868686;
+    font-size: 20px;
+    max-width: 180px;
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+  }
 
   ul {
     overflow: auto;

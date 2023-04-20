@@ -2,11 +2,29 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import MyWalletLogo from "../components/MyWalletLogo";
 import myWalletApi from "../services/mywalletapi.service.js";
- 
+import { useMutation } from "react-query";
+import Loading from "../components/Loading.js";
+
 export default function SignUpPage() {
   const navigate = useNavigate();
 
-  async function handleSubmit(event) {
+  const { mutate, isLoading } = useMutation(
+    async ({ name, email, password }) => {
+      try {
+        const user = {
+          name: name.trim(),
+          email: email.trim(),
+          password: password.trim(),
+        };
+        await myWalletApi.signUp(user);
+        navigate("/");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  );
+
+  function handleSubmit(event) {
     event.preventDefault();
     const name = event.target["name"].value;
     const email = event.target["email"].value;
@@ -18,26 +36,30 @@ export default function SignUpPage() {
       return;
     }
 
-    try {
-      const user = {
-        name: name.trim(),
-        email: email.trim(),
-        password: password.trim(),
-      };
-      await myWalletApi.signUp(user);
-      navigate("/");
-    } catch (err) {
-      alert(err.message);
-    }
+    mutate({ name, email, password });
   }
 
   return (
     <SingUpContainer>
+      <Loading active={isLoading} />
       <form onSubmit={handleSubmit}>
         <MyWalletLogo />
-        <input required name="name" placeholder="Nome" type="text" />
-        <input required name="email" placeholder="E-mail" type="email" />
         <input
+          disabled={isLoading}
+          required
+          name="name"
+          placeholder="Nome"
+          type="text"
+        />
+        <input
+          disabled={isLoading}
+          required
+          name="email"
+          placeholder="E-mail"
+          type="email"
+        />
+        <input
+          disabled={isLoading}
           required
           name="password"
           placeholder="Senha"
@@ -45,13 +67,16 @@ export default function SignUpPage() {
           autoComplete="new-password"
         />
         <input
+          disabled={isLoading}
           required
           name="password-confirm"
           placeholder="Confirme a senha"
           type="password"
           autoComplete="new-password"
         />
-        <button type="submit">Cadastrar</button>
+        <button disabled={isLoading} type="submit">
+          Cadastrar
+        </button>
       </form>
 
       <Link to="/">Já tem uma conta? Entre agora!</Link>

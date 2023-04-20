@@ -8,25 +8,29 @@ import UserContext from "./contexts/user.context";
 
 export default function MyRoutes() {
   const { user } = useContext(UserContext);
+  const isAuthenticated = user !== null;
 
   return (
     <Routes>
       <Route
         path="/"
-        element={!user ? <SignInPage /> : <Navigate to="/home" />}
+        element={isAuthenticated ? <Navigate to="/home" /> : <SignInPage />}
       />
       <Route
         path="/cadastro"
-        element={!user ? <SignUpPage /> : <Navigate to="/home" />}
+        element={isAuthenticated ? <Navigate to="/home" /> : <SignUpPage />}
       />
-      <Route path="/home" element={user ? <HomePage /> : <Navigate to="/" />} />
+      <Route
+        path="/home"
+        element={isAuthenticated ? <HomePage /> : <Navigate to="/" />}
+      />
       <Route
         path="/nova-transacao/:tipo"
-        element={user ? <TransactionsPage /> : <Navigate to="/" />}
+        element={isAuthenticated ? <TransactionsPage /> : <Navigate to="/" />}
       />
       <Route
         path="/editar-registro/:tipo"
-        element={user ? <TransactionsPage /> : <Navigate to="/" />}
+        element={isAuthenticated ? <TransactionsPage /> : <Navigate to="/" />}
       />
     </Routes>
   );

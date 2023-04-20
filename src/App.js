@@ -7,7 +7,7 @@ import { useSession } from "./hooks/session.hooks.js";
 
 export default function App() {
   const currentUser = useSession();
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
 
   useEffect(() => setUser(currentUser), [currentUser]);
 

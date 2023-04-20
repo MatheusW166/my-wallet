@@ -4,6 +4,9 @@ import UserContext from "./contexts/user.context";
 import { useEffect, useState } from "react";
 import MyRoutes from "./routes";
 import { useSession } from "./hooks/session.hooks.js";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 export default function App() {
   const currentUser = useSession();
@@ -12,13 +15,15 @@ export default function App() {
   useEffect(() => setUser(currentUser), [currentUser]);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      <PagesContainer>
-        <BrowserRouter>
-          <MyRoutes />
-        </BrowserRouter>
-      </PagesContainer>
-    </UserContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <UserContext.Provider value={{ user, setUser }}>
+        <PagesContainer>
+          <BrowserRouter>
+            <MyRoutes />
+          </BrowserRouter>
+        </PagesContainer>
+      </UserContext.Provider>
+    </QueryClientProvider>
   );
 }
 

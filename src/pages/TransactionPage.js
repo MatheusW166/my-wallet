@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 import UserContext from "../contexts/user.context";
+import myWalletApi from "../services/mywalletapi.service.js";
 
 export default function TransactionsPage() {
   const { user } = useContext(UserContext);
@@ -14,15 +15,20 @@ export default function TransactionsPage() {
   function handleSubmit(event) {
     event.preventDefault();
     const value = event.target["value"].value;
-    const title = event.target["title"].value;
+    const description = event.target["description"].value;
 
-    // Editar ou salvar
-    console.log({
-      userId: user.id,
-      title: title,
-      value: Number(value),
+    const transaction = {
+      description: description.trim(),
       isExit: tipo === "saida",
-    });
+      value: value,
+    };
+
+    if (!editing) {
+      myWalletApi
+        .createTransaction({ ...transaction, token: user.token })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+    }
   }
 
   return (
@@ -39,9 +45,9 @@ export default function TransactionsPage() {
           type="text"
         />
         <input
-          defaultValue={state?.title}
+          defaultValue={state?.description}
           required
-          name="title"
+          name="description"
           placeholder="Descrição"
           type="text"
         />

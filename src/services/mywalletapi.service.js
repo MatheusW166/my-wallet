@@ -59,6 +59,27 @@ async function signUp({ email, password, name }) {
   }
 }
 
-const myWalletApi = { signUp, logIn, getUserTransactions, getUserData };
+async function createTransaction({ description, value, isExit, token }) {
+  try {
+    const res = await client.post(
+      "/transaction",
+      { description, value, isExit },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    throw mapError(err);
+  }
+}
+
+const myWalletApi = {
+  signUp,
+  logIn,
+  getUserTransactions,
+  getUserData,
+  createTransaction,
+};
 
 export default myWalletApi;

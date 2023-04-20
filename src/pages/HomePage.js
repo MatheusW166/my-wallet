@@ -1,40 +1,43 @@
 import styled from "styled-components";
 import { BiExit } from "react-icons/bi";
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import UserContext from "../contexts/user.context";
 import { Link } from "react-router-dom";
 import { formatMoney } from "../utils/money.utils.js";
 import dayjs from "dayjs";
 import userAuth from "../auth/user.auth.js";
 import myWalletApi from "../services/mywalletapi.service.js";
+import { useQuery } from "react-query";
+import Loading from "../components/Loading.js";
 
 export default function HomePage() {
   const { user, setUser } = useContext(UserContext);
-  const [transactions, setTransactions] = useState();
 
-  useEffect(() => {
-    if (!user) return;
-    myWalletApi
-      .getUserTransactions({
+  const { isLoading, data } = useQuery("transactions", async () => {
+    try {
+      return await myWalletApi.getUserTransactions({
         token: user.token,
-      })
-      .then((res) => setTransactions(res))
-      .catch((err) => alert(err.message));
-  }, [user]);
-
-  const total = transactions?.reduce(
-    (prev, curr) => prev + (curr.isExit ? -curr.value : curr.value),
-    0
-  );
+      });
+    } catch (err) {
+      alert(err.message);
+    }
+  });
 
   function logOut() {
     setUser(null);
     userAuth.endSession();
   }
 
+  const total = data?.reduce(
+    (prev, curr) => prev + (curr.isExit ? -curr.value : curr.value),
+    0
+  );
+
   return (
     <HomeContainer>
+      <Loading active={isLoading} />
+
       <Header>
         <h1>Olá, {user?.name}</h1>
         <Link to="/" onClick={logOut}>
@@ -44,7 +47,7 @@ export default function HomePage() {
 
       <TransactionsContainer>
         <ul>
-          {transactions?.map((t, idx) => (
+          {data?.map((t, idx) => (
             <ListItemContainer key={idx}>
               <Link
                 state={t}
@@ -60,7 +63,6 @@ export default function HomePage() {
             </ListItemContainer>
           ))}
         </ul>
-
         <article>
           <strong>Saldo</strong>
           <Value color={total < 0 ? "negativo" : "positivo"}>
@@ -115,7 +117,16 @@ const TransactionsContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
+
+  ul {
+    overflow: auto;
+    padding-bottom: 10px;
+  }
+
   article {
+    box-shadow: rgba(255, 255, 255, 1) 0px -10px 8px;
+    padding-top: 10px;
     display: flex;
     justify-content: space-between;
     strong {

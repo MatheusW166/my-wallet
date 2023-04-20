@@ -1,13 +1,15 @@
 import { BrowserRouter } from "react-router-dom";
 import styled from "styled-components";
 import UserContext from "./contexts/user.context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MyRoutes from "./routes";
+import { useSession } from "./hooks/session.hooks.js";
 
 export default function App() {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("my-wallet"))
-  );
+  const currentUser = useSession();
+  const [user, setUser] = useState();
+
+  useEffect(() => setUser(currentUser), [currentUser]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

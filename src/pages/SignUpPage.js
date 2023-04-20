@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import MyWalletLogo from "../components/MyWalletLogo";
-import { myWalletApiAdapter } from "../services";
-
+import myWalletApi from "../services/mywalletapi.service.js";
+ 
 export default function SignUpPage() {
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ export default function SignUpPage() {
         email: email.trim(),
         password: password.trim(),
       };
-      await myWalletApiAdapter.signUp(user);
+      await myWalletApi.signUp(user);
       navigate("/");
     } catch (err) {
       alert(err.message);

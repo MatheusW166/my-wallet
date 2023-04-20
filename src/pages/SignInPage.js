@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import MyWalletLogo from "../components/MyWalletLogo";
-import { myWalletApiAdapter } from "../services";
 import { useContext } from "react";
 import UserContext from "../contexts/user.context";
+import userAuth from "../auth/user.auth.js";
 
 export default function SignInPage() {
   const { setUser } = useContext(UserContext);
@@ -14,14 +14,12 @@ export default function SignInPage() {
     const email = event.target["email"].value;
     const password = event.target["password"].value;
     try {
-      const user = await myWalletApiAdapter.logIn({
+      const user = await userAuth.logIn({
         email: email.trim(),
         password: password.trim(),
       });
       setUser(user);
-      console.log(user);
       navigate("/home");
-      localStorage.setItem("my-wallet", JSON.stringify(user));
     } catch (err) {
       alert(err.message);
     }

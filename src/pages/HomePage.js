@@ -4,20 +4,18 @@ import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai";
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../contexts/user.context";
 import { Link } from "react-router-dom";
-import { myWalletApiAdapter } from "../services";
+import { formatMoney } from "../utils/money.utils.js";
 import dayjs from "dayjs";
-
-function formatMoney(value) {
-  if (!value) return "";
-  return value.toFixed(2).replace(".", ",");
-}
+import userAuth from "../auth/user.auth.js";
+import myWalletApi from "../services/mywalletapi.service.js";
 
 export default function HomePage() {
   const { user, setUser } = useContext(UserContext);
   const [transactions, setTransactions] = useState();
 
   useEffect(() => {
-    myWalletApiAdapter
+    if (!user) return;
+    myWalletApi
       .getUserTransactions({
         token: user.token,
       })
@@ -32,7 +30,7 @@ export default function HomePage() {
 
   function logOut() {
     setUser(null);
-    localStorage.removeItem("my-wallet");
+    userAuth.endSession();
   }
 
   return (

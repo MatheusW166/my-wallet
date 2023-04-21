@@ -19,7 +19,6 @@ export default function HomePage() {
     "transactions",
     async () => {
       try {
-        console.log("chama!");
         return await myWalletApi.getUserTransactions({
           token: user.token,
         });

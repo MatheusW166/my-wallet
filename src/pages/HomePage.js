@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import styled from "styled-components";
 import { BiExit } from "react-icons/bi";
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai";
@@ -14,15 +15,20 @@ import Loading from "../components/Loading.js";
 export default function HomePage() {
   const { user, setUser } = useContext(UserContext);
 
-  const { isLoading, data } = useQuery("transactions", async () => {
-    try {
-      return await myWalletApi.getUserTransactions({
-        token: user.token,
-      });
-    } catch (err) {
-      alert(err.message);
-    }
-  });
+  const { isLoading, data, refetch } = useQuery(
+    "transactions",
+    async () => {
+      try {
+        console.log("chama!");
+        return await myWalletApi.getUserTransactions({
+          token: user.token,
+        });
+      } catch (err) {
+        alert(err.message);
+      }
+    },
+    { refetchOnWindowFocus: false }
+  );
 
   function logOut() {
     setUser(null);
@@ -34,7 +40,17 @@ export default function HomePage() {
     0
   );
 
-  const empty = data?.length === 0;
+  async function handleDelete({ _id }) {
+    if (!confirm("Quer deletar essa transação?")) {
+      return;
+    }
+    try {
+      await myWalletApi.deleteTransaction({ id: _id, token: user.token });
+      refetch();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
 
   return (
     <HomeContainer>
@@ -48,23 +64,28 @@ export default function HomePage() {
       </Header>
 
       <TransactionsContainer>
-        {empty ? (
+        {data?.length === 0 ? (
           <p>Não há registros de entrada ou saída</p>
         ) : (
           <ul>
-            {data?.map((t, idx) => (
-              <ListItemContainer key={idx}>
+            {data?.map((transaction) => (
+              <ListItemContainer key={transaction._id}>
                 <Link
-                  state={t}
-                  to={`/editar-registro/${t.isExit ? "saida" : "entrada"}`}>
+                  state={transaction}
+                  to={`/editar-registro/${
+                    transaction.isExit ? "saida" : "entrada"
+                  }`}>
                   <div>
-                    <span>{dayjs(t.createdAt).format("DD/MM")}</span>
-                    <strong>{t.description}</strong>
+                    <span>{dayjs(transaction.createdAt).format("DD/MM")}</span>
+                    <strong>{transaction.description}</strong>
                   </div>
-                  <Value color={t.isExit ? "negativo" : "positivo"}>
-                    {formatMoney(t.value)}
-                  </Value>
                 </Link>
+                <div>
+                  <Value color={transaction.isExit ? "negativo" : "positivo"}>
+                    {formatMoney(transaction.value)}
+                  </Value>
+                  <button onClick={() => handleDelete(transaction)}>x</button>
+                </div>
               </ListItemContainer>
             ))}
           </ul>
@@ -199,5 +220,18 @@ const ListItemContainer = styled.li`
   div span {
     color: #c6c6c6;
     margin-right: 10px;
+  }
+
+  div:last-child {
+    display: flex;
+    align-items: center;
+    button {
+      background: none;
+      color: #868686;
+      font-weight: normal;
+      padding: 0;
+      margin: 0;
+      padding: 0 12px;
+    }
   }
 `;

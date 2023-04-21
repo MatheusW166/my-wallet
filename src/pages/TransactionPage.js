@@ -17,10 +17,12 @@ export default function TransactionsPage() {
 
   const { mutate, isLoading } = useMutation(async (transaction) => {
     try {
-      if (!editing) {
+      if (editing) {
+        await myWalletApi.editTransaction({ id: state._id, ...transaction });
+      } else {
         await myWalletApi.createTransaction(transaction);
-        navigate("/home");
       }
+      navigate("/home");
     } catch (err) {
       alert(err.message);
     }
@@ -51,6 +53,7 @@ export default function TransactionsPage() {
       </h1>
       <form onSubmit={handleSubmit}>
         <input
+          disabled={isLoading}
           defaultValue={state?.value}
           required
           name="value"
@@ -58,13 +61,16 @@ export default function TransactionsPage() {
           type="text"
         />
         <input
+          disabled={isLoading}
           defaultValue={state?.description}
           required
           name="description"
           placeholder="Descrição"
           type="text"
         />
-        <button type="submit">Salvar {type}</button>
+        <button disabled={isLoading} type="submit">
+          Salvar {type}
+        </button>
       </form>
     </TransactionsContainer>
   );

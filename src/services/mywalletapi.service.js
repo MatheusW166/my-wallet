@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-const client = axios.create({ baseURL: "http://localhost:5000" });
+const client = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 
 function mapError(err) {
   const defaultMessage = "Algo deu errado, tente novamente mais tarde";
@@ -74,12 +74,40 @@ async function createTransaction({ description, value, isExit, token }) {
   }
 }
 
+async function editTransaction({ id, description, value, isExit, token }) {
+  try {
+    const res = await client.put(
+      `/transaction/${id}`,
+      { description, value, isExit },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    throw mapError(err);
+  }
+}
+
+async function deleteTransaction({ id, token }) {
+  try {
+    const res = await client.delete(`/transaction/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (err) {
+    throw mapError(err);
+  }
+}
+
 const myWalletApi = {
   signUp,
   logIn,
   getUserTransactions,
   getUserData,
   createTransaction,
+  editTransaction,
+  deleteTransaction,
 };
 
 export default myWalletApi;
